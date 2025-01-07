@@ -1,0 +1,7 @@
+{
+  "repository_url": "https://github.com/openfga/openfga",
+  "clone_repos_directory": "resources/repos",
+  "file_type_to_analyse": ["java", "go"],
+  "satd_keywords": ["TODO", "FIXME", "Hack", "XXX"],
+  "webapp_res_directory": "../../../../resources/webapp"
+}

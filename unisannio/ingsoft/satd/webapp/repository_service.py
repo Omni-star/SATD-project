@@ -39,11 +39,15 @@ class RepositoryService:
     ordered_rep_list: list[any] = []
     repository['creationDate'] = datetime.now().strftime("%d %B %Y")
 
-    for rep in repositories_list:
-      if rep['name'] > repository['name']:
+    for i in range(len(repositories_list)):
+      if repositories_list[i]['name'] > repository['name']:
         ordered_rep_list.append(repository)
+        for j in range(i, len(repositories_list)):
+          ordered_rep_list.append(repositories_list[j])
 
-      ordered_rep_list.append(rep)
+        break
+
+      ordered_rep_list.append(repositories_list[i])
 
     if len(ordered_rep_list) == len(repositories_list):
       ordered_rep_list.append(repository)

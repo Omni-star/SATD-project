@@ -19,8 +19,9 @@ class SatdApp:
     @self.app.route('/')
     def home():
       return render_template('index.html')
+
     @self.app.route('/repository', methods=['GET', 'POST'])
-    def getRepositories():
+    def get_repositories():
       if request.method == 'GET':
         page_index = request.args.get('index', type=int, default=0)
         page_size = request.args.get('size', type=int, default=10)

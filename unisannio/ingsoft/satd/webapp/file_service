@@ -1,0 +1,7 @@
+import os.path
+
+from data_manager import DataManager
+
+class FileService:
+  def __init__(self, data_directory: str):
+    self.data_directory = data_directory

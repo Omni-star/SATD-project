@@ -1,4 +1,5 @@
 import os.path
+from math import ceil
 
 from flask import Flask, render_template, request, make_response
 from .repository_service import RepositoryService
@@ -19,8 +20,12 @@ class SatdApp:
     @self.app.route('/')
     def home():
       return render_template('index.html')
+    
+    @self.app.route('/<page_name>')
+    def navigate(page_name: str = 'index.html'):
+      return render_template(page_name)
 
-    @self.app.route('/repository', methods=['GET', 'POST'])
+    @self.app.route('/satd/repository', methods=['GET', 'POST'])
     def get_repositories():
       if request.method == 'GET':
         page_index = request.args.get('index', type=int, default=0)
@@ -49,6 +54,10 @@ class SatdApp:
           "Method not allowed!",
           405
         ))
+
+    @self.app.route('/satd/test')
+    def get_test():
+      return str(ceil(44 / 6))
       
 
     # @self.app.route('/altra_pagina')

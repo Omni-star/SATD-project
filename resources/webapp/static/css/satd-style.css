@@ -9,11 +9,12 @@
   opacity: 0.4;
 }
 
-.satd-folder text{
+.satd-svg-title{
   fill: rgb(255, 255, 255);
-  stroke: rgb(255, 255, 255);
-  font-size: 2em;
-  stroke-width: 1;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  font-size: 2.5em;
+}
+
+.satd-svg-description{
+  fill: rgb(145, 145, 145);
+  font-size: 1.3em;
 }

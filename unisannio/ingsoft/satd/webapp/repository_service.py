@@ -1,35 +1,53 @@
+import json
 import os.path
+from math import ceil
 
 from unisannio.ingsoft.satd.webapp.data_manager import DataManager
 from datetime import datetime
+
 
 class RepositoryService:
   def __init__(self, data_directory: str = "resources/data"):
     self.json_file_path = os.path.join(data_directory, 'repositories.json')
 
   def get_paged_repositories(self, page_index: int = 0, page_size: int = 0, filter: str = "", order: str = "ASC") -> \
-    list[any]:
+      any:
     repositories_list: list[any] = DataManager.load_data(self.json_file_path)
-
-    if page_size > 0:
-      start_index: int = page_index * page_size
-      end_index: int = start_index + page_size
-      repositories_list = repositories_list[start_index:end_index]
 
     filter = filter.strip()
     if filter:
-      filter = filter.lower()
       filtered_repository: list[any] = []
+      filter = filter.lower()
 
       for repository in repositories_list:
         if filter in str(repository['name']).lower():
           filtered_repository.append(repository)
+          print("filtrando")
 
-        return filtered_repository
+      repositories_list = filtered_repository
 
-    return repositories_list
+    total_repository: int = len(repositories_list)
+    total_pages: int = ceil(total_repository/page_size)
+    if page_size > 0:
+      start_index: int = page_index * page_size
+      if start_index >= total_repository:
+          return {
+            "pageIndex": page_index,
+            "totalPages": total_pages,
+            "content": []
+          }
 
-  def get_repositories(self, page_index: int = 0, page_size: int = 0, filter: str = "") -> list[any]:
+      end_index: int = start_index + page_size
+
+      repositories_list = repositories_list[start_index:end_index]
+
+    return {
+      "pageIndex": page_index,
+      "totalPages": total_pages,
+      "content": repositories_list
+    }
+
+  def get_repositories(self) -> list[any]:
     repositories_list: list[any] = DataManager.load_data(self.json_file_path)
 
     return repositories_list

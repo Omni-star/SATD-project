@@ -1,5 +1,5 @@
 
-function getServerUrl() {
+export function getServerUrl() {
 	let serverUrl = location.protocol +
 		"//" + location.hostname +
 		":" + location.port;
@@ -36,7 +36,7 @@ function HTTPPost(url, jsonBodyString, message, successCallback, errorCallback) 
 }
 
 //================= Methods: HTTP_GET
-function HTTPGet(url, message, successCallback, errorCallback) {
+export function httpGet(url, message, successCallback, errorCallback) {
 
 	let request = new XMLHttpRequest();   // new HttpRequest instance
 
@@ -56,7 +56,7 @@ function HTTPGet(url, message, successCallback, errorCallback) {
 				errorCallback(this.responseText);
 			} else if (this.status === 200) {
 				successCallback(this.responseText);
-				alert(message);
+				console.log(message);
 			}
 		}
 	};

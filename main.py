@@ -10,7 +10,7 @@ from unisannio.ingsoft.satd.webapp.flask_app import SatdApp
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
 
-def _test_git_analyser(name):
+def _test_git_analyser():
   # Important it is to check the current directory
   print(os.getcwd())
 
@@ -19,6 +19,7 @@ def _test_git_analyser(name):
   # Repository url and directory where clone repository into
   r_url: str = config["repository_url"]
   clone_to: str = config["clone_repos_directory"]
+  data_directory: str = config["data_directory"]
   file_type_to_analyse: tuple[str] = tuple(config["file_type_to_analyse"])
   satd_keywords: tuple[str] = tuple(config["satd_keywords"])
 
@@ -29,7 +30,7 @@ def _test_git_analyser(name):
   print(clone_to)
 
   # file_to_analyse: [str] = git_analyser.get_file_list_to_analyse(clone_to, "java", "go")
-  git_analyser.run_satd_analysis(clone_to, file_type_to_analyse, satd_keywords)
+  git_analyser.run_satd_analysis(clone_to, file_type_to_analyse, satd_keywords, data_directory)
 
 
 def _test_web_app():
@@ -43,7 +44,7 @@ def _test_web_app():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-  # _test_git_analyser()
+  #_test_git_analyser()
   _test_web_app()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

@@ -10,11 +10,11 @@ export async function setOnPageSelected(){
 	searchForm.onsubmit = function(event){
 		event.preventDefault();
 		let filter = searchForm.elements[0].value;
-		getRepositoryList(0, 2, filter);
+		getRepositoryList(0, 8, filter);
 	}
 }
 
-export async function getRepositoryList(index = 0, size = 2, filter = "", sort = "ASC") {
+export async function getRepositoryList(index = 0, size = 8, filter = "", sort = "ASC") {
 	let folderTemplate = new DOMParser().parseFromString(
 		`<div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 236" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="satd-folder">

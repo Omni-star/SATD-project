@@ -1,7 +1,9 @@
-import json
+import asyncio
 import os.path
 from math import ceil
 
+from unisannio.ingsoft.satd.git.analysis_status import AnalysisStatus
+from unisannio.ingsoft.satd.git.git_analyser import GitAnalyser
 from unisannio.ingsoft.satd.webapp.data_manager import DataManager
 from datetime import datetime
 
@@ -9,6 +11,7 @@ from datetime import datetime
 class RepositoryService:
   def __init__(self, data_directory: str = "resources/data"):
     self.json_file_path = os.path.join(data_directory, 'repositories.json')
+    self.git_analyser = GitAnalyser("https://github.com/Omni-star/SATD-project")
 
   def get_paged_repositories(self, page_index: int = 0, page_size: int = 0, filter: str = "", order: str = "ASC") -> \
       any:
@@ -71,3 +74,22 @@ class RepositoryService:
       ordered_rep_list.append(repository)
 
     return DataManager.save_data(self.json_file_path, ordered_rep_list)
+
+  async def start_repository_analysis(self,
+                         repository_uri: str,
+                         clone_repos_directory: str,
+                         file_type_to_analyse: [str],
+                         satd_keywords: [str],
+                         data_directory: str
+                         ) -> bool:
+    self.git_analyser = GitAnalyser(repository_uri)
+
+    self.git_analyser.run_satd_analysis(
+      clone_repos_directory,
+      file_type_to_analyse,
+      satd_keywords,
+      data_directory
+    )
+
+  def get_analysis_status(self) -> AnalysisStatus:
+    return self.git_analyser.get_analysis_status()

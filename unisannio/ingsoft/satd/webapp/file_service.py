@@ -15,7 +15,7 @@ class FileService:
                   ) -> any:
     folder_dict: dict[any] = DataManager.load_data(os.path.join(
       self.data_directory,
-      repository_name,
+      repository_name.split(":")[0],
       f"{repository_name}.json")
     )
 
@@ -62,7 +62,7 @@ class FileService:
                 ) -> any:
     folder_dict: dict[any] = DataManager.load_data(os.path.join(
       self.data_directory,
-      repository_name,
+      repository_name.split("-")[0],
       f"{repository_name}.json")
     )
     files_list: list[any] = folder_dict[satd_number]

@@ -18,7 +18,7 @@ export async function getRepositoryList(index = 0, size = 8, filter = "", sort =
 	let folderTemplate = new DOMParser().parseFromString(
 		`<div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 236" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="satd-folder">
-				<a href="photo-detail.html">
+				<a>
 					<path d="M420 216a20 20 0 0 1-20 20H20a20 20 0 0 1-20-20V20a20 20 0 0 1 20-20h126l40 40H400a20 20 0 0 1 20 20z"></path>
 					<text x="210" y="148" text-anchor="middle" class="satd-svg-title text-wrap">OpenFGA</text>
 					<text x="210" y="198" text-anchor="middle" class="satd-svg-description text-wrap">8,906 SATDfiles</text>
@@ -33,34 +33,42 @@ export async function getRepositoryList(index = 0, size = 8, filter = "", sort =
 	).body.firstChild;
 	let repositoryGallery = document.getElementById("repositoryGallery")
 
-	let successCallback = function (response) {
-		let pagedRepositories = JSON.parse(response);
-		console.log(pagedRepositories);
-		repositoryGallery.innerHTML = "";
-		for (let i = 0; i < pagedRepositories.content.length; i++) {
-			let repositoryElement = folderTemplate.cloneNode(true);
-			let repository = pagedRepositories.content[i];
+	let successCallback = function (status, response) {
 
-			repositoryElement.querySelector(".satd-svg-title").innerHTML = repository.name;
-			repositoryElement.querySelector(".satd-svg-description").innerHTML = repository.filesWithSATD + " SATD files";
+		if (status == 200) {
+			let pagedRepositories = JSON.parse(response);
+			console.log(pagedRepositories);
+			repositoryGallery.innerHTML = "";
+			for (let i = 0; i < pagedRepositories.content.length; i++) {
+				let repositoryElement = folderTemplate.cloneNode(true);
+				repositoryGallery.appendChild(repositoryElement);
+				let repository = pagedRepositories.content[i];
 
-			let folderDescription = repositoryElement.querySelector("div");
-			folderDescription.children[0].innerHTML = repository.creationDate;
-			folderDescription.children[1].innerHTML = repository.totalFiles + " files";
+				repositoryElement.querySelector("a").onclick = function(){
+					sessionStorage.setItem("repositoryName", repository.name + ":" + repository.creationDate);
+					sessionStorage.setItem("pageIndex", "0");
+					window.location.href = "repository-detail.html";
+				}
+				repositoryElement.querySelector(".satd-svg-title").innerHTML = repository.name;
+				repositoryElement.querySelector(".satd-svg-description").innerHTML = repository.filesWithSATD + " SATD files";
 
-			repositoryGallery.appendChild(repositoryElement);
+				let folderDescription = repositoryElement.querySelector("div");
+				folderDescription.children[0].innerHTML = new Date(
+					repository.creationDate * 1000).toLocaleDateString('en-GB',
+					{day: 'numeric', month: 'long', year: 'numeric'}
+				);
+				folderDescription.children[1].innerHTML = repository.totalFiles + " files";
+			}
+			sessionStorage.setItem("pageIndex", pagedRepositories.pageIndex);
+			sessionStorage.setItem("totalPages", pagedRepositories.totalPages);
+
+			managePagination(size, filter);
 		}
-		sessionStorage.setItem("pageIndex", pagedRepositories.pageIndex);
-		sessionStorage.setItem("totalPages", pagedRepositories.totalPages);
-
-		managePagination(size, filter);
 	}
 
 	let errorCallback = function (response) {
 		alert("Error while fetching repository list");
 	}
-
-	let repositoryUrl = communicationService.getServerUrl() + "/repository";
 
 	communicationService.httpGet(
 		(
@@ -71,8 +79,7 @@ export async function getRepositoryList(index = 0, size = 8, filter = "", sort =
 			"&sort=" + sort
 		),
 		"Repository List", 
-		successCallback, 
-		errorCallback
+		successCallback
 	);
 }
 

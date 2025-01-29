@@ -8,7 +8,7 @@ export function getServerUrl() {
 }
 
 //================= Methods: HTTP_POST
-function HTTPPost(url, jsonBodyString, message, successCallback, errorCallback) {
+export function HTTPPost(url, jsonBodyString, callback) {
 	//event.preventDefault();
 
 	let request = new XMLHttpRequest();   // new HttpRequest instance
@@ -16,48 +16,31 @@ function HTTPPost(url, jsonBodyString, message, successCallback, errorCallback) 
 	request.open("POST", url, true);
 	request.setRequestHeader("content-type", "application/json");
 
-	request.onerror = function () {
-		alert.log("** An error occurred during the transaction");
-	};
+	// request.onerror = function () {
+	// 	alert.log("** An error occurred during the transaction");
+	// };
 	//	request.send(JSON.stringify(jsonBodyString));
 	request.send(jsonBodyString);
 	request.onreadystatechange = function () {
 		if (this.readyState === 4) {
-			if (this.status === 500) {
-				let results = JSON.parse(this.responseText);
-				alert("error" + this.responseText);
-				errorCallback(this.responseText);
-			} else if (this.status === 200) {
-				successCallback(this.responseText);
-				alert(message);
-			}
+			callback(this.status, this.responseText);
 		}
 	};
 }
 
 //================= Methods: HTTP_GET
-export function httpGet(url, message, successCallback, errorCallback) {
+export function httpGet(url, message, callback) {
 
 	let request = new XMLHttpRequest();   // new HttpRequest instance
 
 	request.open("GET", url, true);
 	request.setRequestHeader("content-type", "application/json");
 
-	request.onerror = function () {
-		alert.log("** An error occurred during the transaction");
-	};
-
 	request.send();
 	request.onreadystatechange = function () {
 		if (this.readyState === 4) {
-			if (this.status === 500) {
-				let results = JSON.parse(this.responseText);
-				alert("error" + this.responseText);
-				errorCallback(this.responseText);
-			} else if (this.status === 200) {
-				successCallback(this.responseText);
-				console.log(message);
-			}
+			console.log(message);
+			callback(this.status, this.responseText);
 		}
 	};
 }

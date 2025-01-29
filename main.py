@@ -77,7 +77,7 @@ def _prepare_directory():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-  # _test_git_analyser()
+  #_test_git_analyser()
   #_prepare_directory()
   #_test_delete_local_repository()
   _test_web_app()

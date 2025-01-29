@@ -1,6 +1,7 @@
 # PyDriller use your local git credential
 # to access on git platform and your own repositories,
 # beyond all public repositories
+import asyncio
 import os
 import shutil
 
@@ -37,10 +38,8 @@ class GitAnalyser:
     )
 
     try:
-    #  for commit in
-      repository.traverse_commits()
-    #:
-    #    commit
+      for commit in repository.traverse_commits():
+        print(commit.author.name)
     except Exception as err:
       print(err, " - error while trying to clone repository.")
       self._on_error()
@@ -71,9 +70,11 @@ class GitAnalyser:
 
   def run_satd_analysis(self, clone_path: str, file_types: tuple[str, ...], satd_keywords: tuple[str, ...], output_path: str):
     file_to_analyse: list[str] = []
+    self.status = AnalysisStatus.IN_PROGRESS
 
     self.clone_repository(clone_path=clone_path)
     if self.status == AnalysisStatus.ERROR:
+      print("Analysis Error")
       return
 
     repository_name = self.repository_uri.split("/")[-1]
@@ -82,10 +83,14 @@ class GitAnalyser:
     totalFilesAnalyzed: int = 0
     filesWithSATD: int = 0
     result: dict = {}
-    for curDirPath, _, filesName in os.walk(repository_path, onerror=self._on_error()):
+    print("Analyzing " + repository_path)
+    for curDirPath, paths, filesName in os.walk(repository_path):
+      print(paths)
       for file in filesName:
+        print(file)
         if file.endswith(file_types):
           totalFilesAnalyzed += 1
+          print(f"Total files Analyzed: {totalFilesAnalyzed}")
 
           satd: int = 0
           totalLines: int = 0
@@ -142,16 +147,20 @@ class GitAnalyser:
             }
           )
 
+    current_timestamp = datetime.now().timestamp()
+
     self._save_repository({
       "name": repository_name,
       "filesWithSATD": filesWithSATD,
       "totalFiles": totalFilesAnalyzed,
-      "creationDate": datetime.now().strftime("%d %B %Y")
+      "creationDate": current_timestamp
     }, output_path, "repositories.json")
 
-    DataManager.save_data(os.path.join(output_path, repository_name), f"{repository_name}.json", result)
+    DataManager.save_data(os.path.join(output_path, repository_name), f"{repository_name}:{current_timestamp}.json", result)
 
     self._on_done()
+
+    asyncio.run(self._reset_status())
 
 
   def delete_local_repository(self, repository_path: str):
@@ -165,7 +174,7 @@ class GitAnalyser:
   def _save_repository(self, repository: dict, output_path: str, file_name: str) -> bool:
     repositories_list: list[dict] = DataManager.load_data(os.path.join(output_path, file_name))
     ordered_rep_list: list[dict] = []
-    repository['creationDate'] = datetime.now().strftime("%d %B %Y")
+    repository['creationDate'] = datetime.now().timestamp()
 
     for i in range(len(repositories_list)):
       repository_name: str = repository['name'].lower()
@@ -187,7 +196,15 @@ class GitAnalyser:
     return self.status
 
   def _on_error(self):
+    print("ERRORE: ")
     self.status = AnalysisStatus.ERROR
 
   def _on_done(self):
     self.status = AnalysisStatus.DONE
+
+  async def _reset_status(self):
+
+    await asyncio.sleep(180)
+
+    self.status = AnalysisStatus.NOT_STARTED
+

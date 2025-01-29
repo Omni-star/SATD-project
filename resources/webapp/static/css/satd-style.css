@@ -5,8 +5,22 @@
   stroke-linejoin: round;
 }
 
+.satd-file{
+  background-color: #3399CC;
+  fill: none;
+  stroke: white;
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .satd-folder:hover path{
   opacity: 0.4;
+}
+
+.satd-file:hover{
+  opacity: 0.4;
+  cursor: pointer;
 }
 
 .satd-svg-title{
@@ -17,4 +31,58 @@
 .satd-svg-description{
   fill: rgb(145, 145, 145);
   font-size: 1.3em;
+}
+
+.satd-file-rect{
+  stroke: black;
+  stroke-width: 10;
+}
+
+.satd-file-title{
+  stroke-width: 0;
+  background-color: white;
+  fill: white;
+  font-size: 1.3em;
+}
+
+.satd-file-description{
+  stroke-width: 0;
+  background-color: white;
+  fill: white;
+  font-size: 1.3em;
+}
+
+.satd-textarea{
+  width: 100%;
+  height: 100%;
+  font-size: 1.3em;
+}
+
+.satd-text-4{
+  font-size: 1.5em;
+}
+
+#satd-analysis-container{
+  max-height: 400px;
+  overflow: hidden;
+  background-color: #333;
+  margin-bottom: 90px;
+  position: relative;
+}
+
+.satd-notification{
+  display: none;
+  background-color: white;
+  padding: 6px;
+  margin: 4px solid black;
+}
+
+.satd-notification i{
+  color: lightgreen;
+}
+
+.satd-spinner{
+  display: none;
+  width: 3em;
+  height: 3em;
 }

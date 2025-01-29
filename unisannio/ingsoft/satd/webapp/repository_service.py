@@ -30,15 +30,15 @@ class RepositoryService:
       repositories_list = filtered_repository
 
     total_repository: int = len(repositories_list)
-    total_pages: int = ceil(total_repository/page_size)
+    total_pages: int = ceil(total_repository / page_size)
     if page_size > 0:
       start_index: int = page_index * page_size
       if start_index >= total_repository:
-          return {
-            "pageIndex": page_index,
-            "totalPages": total_pages,
-            "content": []
-          }
+        return {
+          "pageIndex": page_index,
+          "totalPages": total_pages,
+          "content": []
+        }
 
       end_index: int = start_index + page_size
 
@@ -58,7 +58,7 @@ class RepositoryService:
   def save_repository(self, repository: any) -> bool:
     repositories_list: list[any] = DataManager.load_data(self.json_file_path)
     ordered_rep_list: list[any] = []
-    repository['creationDate'] = datetime.now().strftime("%d %B %Y")
+    repository['creationDate'] = datetime.now().timestamp()
 
     for i in range(len(repositories_list)):
       if repositories_list[i]['name'] > repository['name']:
@@ -75,13 +75,13 @@ class RepositoryService:
 
     return DataManager.save_data(self.json_file_path, ordered_rep_list)
 
-  async def start_repository_analysis(self,
-                         repository_uri: str,
-                         clone_repos_directory: str,
-                         file_type_to_analyse: [str],
-                         satd_keywords: [str],
-                         data_directory: str
-                         ) -> bool:
+  def start_repository_analysis(self,
+                                repository_uri: str,
+                                clone_repos_directory: str,
+                                file_type_to_analyse: tuple[str, ...],
+                                satd_keywords: tuple[str, ...],
+                                data_directory: str
+                                ):
     self.git_analyser = GitAnalyser(repository_uri)
 
     self.git_analyser.run_satd_analysis(

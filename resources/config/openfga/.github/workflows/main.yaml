@@ -1,0 +1,75 @@
+name: Main
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v3.5.2
+
+      - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
+        with:
+          go-version-file: './go.mod'
+          cache-dependency-path: './go.sum'
+
+      - name: Tests
+        run: make test
+
+      - name: upload coverage to codecov
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
+        with:
+          files: ./coverageunit.out
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+
+  go-bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v3.5.2
+
+      - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
+        with:
+          go-version-file: './go.mod'
+          cache-dependency-path: './go.sum'
+          check-latest: true
+
+      # Run benchmark with `go test -bench` and stores the output to a file
+      - name: Run benchmark
+        run: |
+          set -o pipefail
+          make test-bench | tee bench_output.txt
+
+      - name: Get benchmark as JSON
+        uses: benchmark-action/github-action-benchmark@d48d326b4ca9ba73ca0cd0d59f108f9e02a381c7 # v1.20.4
+        with:
+          # What benchmark tool the output.txt came from
+          tool: 'go'
+          # Where the output from the benchmark tool is stored
+          output-file-path: bench_output.txt
+          # Write benchmarks to this file
+          external-data-json-path: ./cache/benchmark-data.json
+          # Workflow will fail when an alert happens
+          fail-on-alert: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          comment-on-alert: true
+
+      - name: Get CPU information
+        uses: kenchan0130/actions-system-info@c74331947b5734764feeb375de4038960f2576bd # v1
+        id: system-info
+
+      - name: Save benchmark JSON to cache
+        uses: actions/cache/save@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+        with:
+          path: ./cache/benchmark-data.json
+          # Save with commit hash to avoid "cache already exists"
+          # Save with OS & CPU info to prevent comparing against results from different CPUs
+          key: ${{ github.sha }}-${{ runner.os }}-${{ steps.system-info.outputs.cpu-model }}-go-benchmark

@@ -30,36 +30,16 @@ test_files_open_test = {
     }
   ]
 }
-test_files_open_repository = {
-  "1": [
-    {
-      "name": "flags.go",
-      "totalLines": 291,
-      "SATDLines": [
-        "212: // TODO: make breaking change for cache limit"
-      ]
-    }
-  ],
-  "3": [
-    {
-      "name": "storage.go",
-      "totalLines": 347,
-      "SATDLines": [
-        "282: // CreateStore must return an error if the store ID or the name aren't set. TODO write test.",
-        "287: // If the store ID didn't exist it must return ErrNotFound. TODO write test (memory doesn't satisfy this?)",
-        "293: // ListStores returns a list of non-deleted stores that match the provided options. TODO write test with the IDs filter."
-      ]
-    }
-  ]
-}
 
 
-def setup_module(module):
+def setup_function(function):
   print("setup")
   DataManager.save_data(os.path.join(data_directory, "openTest"), "openTest:237139127.json", test_files_open_test)
-  DataManager.save_data(os.path.join(data_directory, "openRepository"), "openRepository:237139127.json",
-                        test_files_open_repository)
 
+
+def teardown_function(function):
+  print("teardown")
+  DataManager.delete_local_repository(test_directory)
 
 def test_get_folders():
   file_service = FileService(data_directory)

@@ -81,7 +81,7 @@ class SatdApp:
 
     @self.app.route('/satd/repository/<repository_name>/folder/<satd_number>')
     def get_files(repository_name: str, satd_number: int):
-      page_index = request.args.get('index', type=int, default=0)
+      page_index = request.args.get('index', type=str, default="0")
       page_size = request.args.get('size', type=int, default=10)
       filter = request.args.get('filter', type=str, default="")
       order = request.args.get('order', type=str, default="ASC")
@@ -125,22 +125,6 @@ class SatdApp:
                         self.config['data_directory'],))
         thread.start()
 
-        # process = Process(target=self.repository_service.start_repository_analysis,
-        #                   args=(repository['url'],
-        #                 self.config['clone_repos_directory'],
-        #                 tuple(self.config['file_type_to_analyse']),
-        #                 tuple(self.config['satd_keywords']),
-        #                 self.config['data_directory'],))
-        # process.start()
-
-        # self.future = self.executor.submit(self.repository_service.start_repository_analysis,
-        #                 repository['url'],
-        #                 self.config['clone_repos_directory'],
-        #                 self.config['file_type_to_analyse'],
-        #                 self.config['satd_keywords'],
-        #                 self.config['data_directory']
-        #                 )
-
         return self.app.make_response((
           "Request accepted.",
           200
@@ -161,4 +145,4 @@ class SatdApp:
 
   def run(self):
     # Avvia l'app Flask
-    self.app.run(debug=True)
+    self.app.run(debug=False)

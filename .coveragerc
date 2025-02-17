@@ -1,0 +1,10 @@
+[run]
+include =
+    unisannio/*
+omit =
+    */test/*
+    */__init__.py
+    unisannio/ingsoft/satd/webapp/flask_app.py
+
+[report]
+fail_under = 80

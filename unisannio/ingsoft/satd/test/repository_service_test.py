@@ -31,7 +31,7 @@ test_repositories = [
 ]
 
 
-def setup_module(module):
+def setup_function(function):
   print("setup")
   DataManager.save_data(
     data_directory,
@@ -39,7 +39,7 @@ def setup_module(module):
     test_repositories
   )
 
-def teardown_module(module):
+def teardown_function(function):
   print("teardown")
   DataManager.delete_local_repository(test_directory)
 

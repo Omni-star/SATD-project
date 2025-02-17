@@ -1,5 +1,4 @@
 import os.path
-import sys
 
 from unisannio.ingsoft.satd.git.git_analyser import GitAnalyser
 from unisannio.ingsoft.satd.webapp.data_manager import DataManager
@@ -10,8 +9,9 @@ file_types = ("go",)
 satd_words = ("TODO", "FIXME", "Hack", "XXX")
 test_directory = "../../../../resources/test"
 
-#def setup_module(module):
-#  print("Setup")  # Codice eseguito prima del test
+def setup_module(module):
+  print("Setup")  # Codice eseguito prima del test
+  print(os.getcwd())
 #  DataManager.delete_local_repository(test_directory)
 
 def teardown_function(function):

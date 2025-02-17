@@ -26,6 +26,8 @@ jobs:
     - name: Enable project resources access
       run: |
         sudo chmod -R 777 ./resources
+        pwd
+        whoiam
         mkdir ./resources/test
     - name: Install dependencies
       run: |

@@ -77,7 +77,7 @@ class RepositoryService:
     if len(ordered_rep_list) == len(repositories_list):
       ordered_rep_list.append(repository)
 
-    return DataManager.save_data(self.json_file_path, ordered_rep_list)
+    return DataManager.save_file_data(self.json_file_path, ordered_rep_list)
 
   def start_repository_analysis(self,
                                 repository_uri: str,

@@ -78,7 +78,7 @@ def test_get_paged_repositories():
   repositories = repository_service.get_paged_repositories(
     page_index=0,
     page_size=1,
-    filter="fix",
+    filter="",
     order="ASC"
   )["content"]
 
@@ -101,3 +101,41 @@ def test_get_paged_filtered_repositories():
   print(repositories)
 
   assert repositories[0]["name"] in test_repositories[0]["name"]
+
+def test_get_reversed_repositories():
+  repository_service = RepositoryService(
+    data_directory
+  )
+  repositories = repository_service.get_paged_repositories(
+    page_index=0,
+    page_size=100,
+    filter="",
+    order="DESC"
+  )["content"]
+
+  print(repositories)
+
+  assert repositories[0]["name"] in test_repositories[2]["name"]
+
+
+def test_save_repository():
+  repository_service = RepositoryService(
+    data_directory
+  )
+  assert repository_service.save_repository({
+    "name": "testSave",
+    "totalFiles": 129,
+    "SATDWords": ["fixed"],
+    "filesWithSATD": 3,
+    "creationDate": 2312882391
+  })
+
+  repositories = repository_service.get_repositories()
+
+  ok = False
+  for repo in repositories:
+    if repo["name"] == "testSave":
+      ok = True
+      break
+
+  assert ok

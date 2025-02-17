@@ -18,6 +18,19 @@ class DataManager:
     return data
 
   @staticmethod
+  def save_file_data(json_file_path: str, data: Any) -> bool:
+    try:
+      if not os.path.exists(json_file_path):
+        file_name = json_file_path.split("/")[-1]
+        new_directory = json_file_path.replace(file_name, "")
+        os.makedirs(new_directory, exist_ok=True)
+      with open(json_file_path, "w") as f:
+        json.dump(data, f, indent=2)
+    except FileNotFoundError as e:
+      return False
+    return True
+
+  @staticmethod
   def save_data(json_file_path: str, file_name: str, data: Any) -> bool:
     try:
       os.makedirs(json_file_path, exist_ok=True)

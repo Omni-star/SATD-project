@@ -19,6 +19,13 @@ class FileService:
       f"{repository_name}.json")
     )
 
+    if not folder_dict:
+      return {
+        "pageIndex": 0,
+        "totalPages": 0,
+        "content": []
+      }
+
     total_repository: int = len(folder_dict)
     total_pages: int = ceil(total_repository / page_size)
     start_index: int = 0
@@ -54,7 +61,7 @@ class FileService:
 
   def get_files(self,
                 repository_name: str,
-                satd_number: int,
+                satd_number: str,
                 page_index: int = 0,
                 page_size: int = 0,
                 filter: str = "",
@@ -62,9 +69,17 @@ class FileService:
                 ) -> any:
     folder_dict: dict[any] = DataManager.load_data(os.path.join(
       self.data_directory,
-      repository_name.split("-")[0],
+      repository_name.split(":")[0],
       f"{repository_name}.json")
     )
+
+    if not folder_dict:
+      return {
+        "pageIndex": 0,
+        "totalPages": 0,
+        "content": []
+      }
+
     files_list: list[any] = folder_dict[satd_number]
 
     filter = filter.strip()
@@ -73,9 +88,10 @@ class FileService:
       filter = filter.lower()
 
       for file in files_list:
-        if filter in str(file['name']).lower():
-          filtered_files.append(file)
-          print("filtrando")
+        for satd_line in file["SATDLines"]:
+          if filter in satd_line.lower():
+            filtered_files.append(file)
+            print("filtrando")
 
       files_list = filtered_files
 

@@ -3,6 +3,6 @@
   "data_directory": "resources/data",
   "clone_repos_directory": "resources/repos",
   "file_type_to_analyse": ["java", "go", "kt", "kts"],
-  "satd_keywords": ["TODO", "FIXME", "Hack", "XXX"],
+  "satd_keywords": ["todo", "fixme", "hack", "xxx"],
   "webapp_res_directory": "../../../../resources/webapp"
 }

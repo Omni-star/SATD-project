@@ -3,7 +3,6 @@
 # beyond all public repositories
 import asyncio
 import os
-import shutil
 
 from datetime import datetime
 from pydriller import Repository, Git
@@ -32,23 +31,32 @@ class GitAnalyser:
       print(err, " - error while trying to access to repository commits.")
 
   def clone_repository(self, clone_path: str):
+    os.makedirs(clone_path, exist_ok=True)
+
     repository: Repository = Repository(
       path_to_repo=self.repository_uri,
       clone_repo_to=clone_path
     )
 
     try:
+      total_commit = 0
       for commit in repository.traverse_commits():
-        print(commit.author.name)
+        print("{\"Commit\": {\"changedLines\": ", commit.lines,
+              ", \"changedFiles\": \"", commit.files,
+              ", \"id\": \"", commit.hash, "}}")
+        total_commit += 1
+      print("Total commit: " + str(total_commit))
     except Exception as err:
       print(err, " - error while trying to clone repository.")
       self._on_error()
 
-  def _get_file_list_to_analyse(self, clone_path: str, file_types: tuple[str]) -> [str]:
-    file_to_analyse: [str] = []
+  def get_file_list_to_analyse(self, clone_path: str, file_types: tuple[str]) -> [str]:
+    file_to_analyse: list[str] = []
+    self.status = AnalysisStatus.IN_PROGRESS
 
     self.clone_repository(clone_path=clone_path)
-    if self.error:
+    if self.status == AnalysisStatus.ERROR:
+      print("File to analyse finding Error")
       return
 
     repository_path = self.repository_uri.split("/")[-1]
@@ -64,12 +72,19 @@ class GitAnalyser:
           break
 
     print("Numero file nel repository: ", len(gr.files()))
-    print("Numero file da analizzare: ", file_to_analyse.count())
+    print("Numero file da analizzare: ", len(file_to_analyse))
 
     return file_to_analyse
 
-  def run_satd_analysis(self, clone_path: str, file_types: tuple[str, ...], satd_keywords: tuple[str, ...], output_path: str):
+  def run_satd_analysis(self,
+                        clone_path: str,
+                        file_types: tuple[str, ...],
+                        satd_keywords: tuple[str, ...],
+                        output_path: str,
+                        status_timeout_m: int = 3
+                        ):
     file_to_analyse: list[str] = []
+    repository_satd_keywords: list[str] = []
     self.status = AnalysisStatus.IN_PROGRESS
 
     self.clone_repository(clone_path=clone_path)
@@ -97,10 +112,15 @@ class GitAnalyser:
           lines: list[str] = []
           with open(os.path.join(curDirPath, file), 'r') as f:
             for i, line in enumerate(f):
-              if any(keyword in line for keyword in satd_keywords):
-                #print(f"{file}:{i + 1}: {line.strip()}")
-                lines.append(f"{i + 1}: {line.strip()}")
-                satd += 1
+              for keyword in satd_keywords:
+                if keyword.lower() in line.lower():
+                  # print(f"{file}:{i + 1}: {line.strip()}")
+                  if not keyword in repository_satd_keywords:
+                    repository_satd_keywords.append(keyword)
+
+                  lines.append(f"{i + 1}: {line.strip()}")
+                  satd += 1
+                  break
               totalLines = i
 
             if satd > 0:
@@ -147,45 +167,45 @@ class GitAnalyser:
             }
           )
 
-    current_timestamp = datetime.now().timestamp()
-
+    current_timestamp = int(datetime.now().timestamp())
     self._save_repository({
       "name": repository_name,
-      "filesWithSATD": filesWithSATD,
       "totalFiles": totalFilesAnalyzed,
+      "filesWithSATD": filesWithSATD,
+      "SATDWords": repository_satd_keywords,
       "creationDate": current_timestamp
     }, output_path, "repositories.json")
 
-    DataManager.save_data(os.path.join(output_path, repository_name), f"{repository_name}:{current_timestamp}.json", result)
+    DataManager.save_data(
+      os.path.join(output_path, repository_name),
+      f"{repository_name}:{current_timestamp}.json",
+      result
+    )
 
     self._on_done()
 
-    asyncio.run(self._reset_status())
-
-
-  def delete_local_repository(self, repository_path: str):
-    try:
-      shutil.rmtree(repository_path)
-      print(f"The folder '{repository_path}' has been removed successfully.")
-    except OSError as e:
-      print(f"Error while removing the folder: {e}")
-
+    return asyncio.run(self._reset_status(status_timeout_m))
 
   def _save_repository(self, repository: dict, output_path: str, file_name: str) -> bool:
     repositories_list: list[dict] = DataManager.load_data(os.path.join(output_path, file_name))
     ordered_rep_list: list[dict] = []
-    repository['creationDate'] = datetime.now().timestamp()
+    if not repository.get('creationDate'):
+      repository['creationDate'] = int(datetime.now().timestamp())
 
-    for i in range(len(repositories_list)):
-      repository_name: str = repository['name'].lower()
-      if repositories_list[i]['name'].lower() > repository_name:
-        ordered_rep_list.append(repository)
-        for j in range(i, len(repositories_list)):
-          ordered_rep_list.append(repositories_list[j])
+    if repositories_list:
+      for i in range(len(repositories_list)):
+        repository_name: str = repository['name'].lower()
+        if repositories_list[i]['name'].lower() > repository_name:
+          ordered_rep_list.append(repository)
+          for j in range(i, len(repositories_list)):
+            ordered_rep_list.append(repositories_list[j])
 
-        break
+          break
 
-      ordered_rep_list.append(repositories_list[i])
+        ordered_rep_list.append(repositories_list[i])
+    else:
+      ordered_rep_list = [repository]
+      return DataManager.save_data(output_path, file_name, ordered_rep_list)
 
     if len(ordered_rep_list) == len(repositories_list):
       ordered_rep_list.append(repository)
@@ -202,9 +222,8 @@ class GitAnalyser:
   def _on_done(self):
     self.status = AnalysisStatus.DONE
 
-  async def _reset_status(self):
+  async def _reset_status(self, action_delay: int = 3):
 
-    await asyncio.sleep(180)
+    await asyncio.sleep(action_delay*60)
 
     self.status = AnalysisStatus.NOT_STARTED
-

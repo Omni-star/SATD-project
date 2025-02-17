@@ -1,4 +1,3 @@
-import asyncio
 import os.path
 from math import ceil
 
@@ -23,9 +22,11 @@ class RepositoryService:
       filter = filter.lower()
 
       for repository in repositories_list:
-        if filter in str(repository['name']).lower():
-          filtered_repository.append(repository)
-          print("filtrando")
+        for satd_word in repository['SATDWords']:
+          if filter in satd_word:
+            filtered_repository.append(repository)
+            print("filtrando")
+            break
 
       repositories_list = filtered_repository
 
@@ -43,6 +44,9 @@ class RepositoryService:
       end_index: int = start_index + page_size
 
       repositories_list = repositories_list[start_index:end_index]
+
+    if repositories_list and order.upper() in "DESC":
+      repositories_list.reverse()
 
     return {
       "pageIndex": page_index,

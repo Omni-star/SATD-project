@@ -1,5 +1,7 @@
 import json
 import os
+import shutil
+import sys
 from typing import Union, Any
 
 
@@ -24,3 +26,11 @@ class DataManager:
     except FileNotFoundError as e:
       return False
     return True
+
+  @staticmethod
+  def delete_local_repository(repository_path: str):
+    try:
+      shutil.rmtree(repository_path)
+      print(f"The folder '{repository_path}' has been removed successfully.")
+    except OSError as e:
+      print(f"Error while removing the folder: {e}", file=sys.stderr)

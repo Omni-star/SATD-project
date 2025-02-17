@@ -34,6 +34,7 @@ test_files_open_test = {
 
 def setup_function(function):
   print("setup")
+  print(os.getcwd())
   DataManager.save_data(os.path.join(data_directory, "openTest"), "openTest:237139127.json", test_files_open_test)
 
 

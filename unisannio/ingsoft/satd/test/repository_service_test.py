@@ -32,7 +32,8 @@ test_repositories = [
 
 
 def setup_function(function):
-  print("setup")
+  print("Setup")  # Codice eseguito prima del test
+  print(os.getcwd())
   DataManager.save_data(
     data_directory,
     data_file_name,

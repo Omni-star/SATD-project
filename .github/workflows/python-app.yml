@@ -28,6 +28,7 @@ jobs:
         sudo chmod -R 777 ./
     - name: Install dependencies
       run: |
+        python3 -m venv venv
         ls -al
         source ./venv/bin/activate.sh
         python -m pip install --upgrade pip

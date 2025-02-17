@@ -173,4 +173,5 @@ cython_debug/
 # Customization
 resources/repos
 resources/data
+resources/test
 .idea

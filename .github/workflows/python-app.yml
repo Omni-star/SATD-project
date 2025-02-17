@@ -9,16 +9,13 @@ on:
   pull_request:
     branches: [ "main" ]
 
-permissions:
-  contents: write
-
 jobs:
   test:
-
     runs-on: ubuntu-20.04
-
+    permissions:
+      contents: write
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Python 3.9.6
       uses: actions/setup-python@v3
       with:

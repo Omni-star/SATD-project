@@ -27,7 +27,7 @@ jobs:
       run: |
         sudo chmod -R 777 ./resources
         pwd
-        whoiam
+        whoami
         mkdir ./resources/test
     - name: Install dependencies
       run: |

@@ -7,7 +7,7 @@ repository_uri = "https://github.com/openfga/openfga"
 repository_name = repository_uri.split("/")[-1]
 file_types = ("go",)
 satd_words = ("TODO", "FIXME", "Hack", "XXX")
-test_directory = "../../../../resources/test"
+test_directory = "test"
 
 def setup_module(module):
   print("Setup")  # Codice eseguito prima del test

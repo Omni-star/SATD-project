@@ -3,7 +3,7 @@ import os
 from unisannio.ingsoft.satd.webapp.data_manager import DataManager
 from unisannio.ingsoft.satd.webapp.file_service import FileService
 
-test_directory = "../../../../resources/test"
+test_directory = "test"
 data_directory = os.path.join(test_directory, "data")
 test_files_open_test = {
   "0": [

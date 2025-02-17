@@ -3,7 +3,7 @@ import os.path
 from unisannio.ingsoft.satd.webapp.data_manager import DataManager
 from unisannio.ingsoft.satd.webapp.repository_service import RepositoryService
 
-test_directory = "../../../../resources/test"
+test_directory = "test"
 data_directory = os.path.join(test_directory, "data")
 data_file_name = "repositories.json"
 test_repositories = [

@@ -26,6 +26,7 @@ jobs:
     - name: Enable project resources access
       run: |
         sudo chmod -R 777 ./resources
+        mkdir ./resources/test
     - name: Install dependencies
       run: |
         python3 -m venv venv
